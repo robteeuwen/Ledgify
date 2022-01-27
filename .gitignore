@@ -1,2 +1,6 @@
-# exclude IDE files 
+# exclude IDE and system files
 ./idea
+.DS_Store
+
+# exclude secrets and environment variables
+.env
