@@ -1,6 +1,7 @@
 # exclude IDE and system files
-./idea
 .DS_Store
+.idea/
+*__pycache__
 
 # exclude secrets and environment variables
 .env
