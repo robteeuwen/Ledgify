@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ledgify</title>
+    <meta id="played_tracks" data-tracks="{{ tracks_json }}">
+    <script>
+        /**
+         * Collect the 50 most recently played tracks and merge them with tracks that had previously been loaded before.
+         *
+         * The challenge is that Spotify only keeps 50 recently played tracks. If we want to show more, we have to store
+         * them from previous calls to the API. The solution to do this client-side is to store them in sessionStorage,
+         * which persists upon refresh, and append to that list of tracks, instead of overwriting it.
+         *
+         */
+
+        // grab the data from the meta tag above. This is necessary because inserting python variables into javascript
+        // doesn't work.
+        let new_tracks = JSON.parse(document.getElementById('played_tracks').getAttribute('data-tracks'))
+
+        // extract played_at column from the json object, we need this to figure out if there's overlap with the tracks
+        // already in the browser.
+        played_at = new_tracks.map(lambda => lambda.played_at)
+
+        // extract old tracks
+        if (sessionStorage.played_tracks !== undefined) {
+            existing_tracks = JSON.parse(sessionStorage.getItem('played_tracks'))
+            existing_played_at = existing_tracks.map(lambda => lambda.played_at)
+
+            // find the index of the first timestamp from the new list of tracks that's already inside the existing list
+            // if there is a partial overlap it should be fine
+            // if there is no overlap, first_match will be -1, and we should just concatenate without slicing
+            // if the lists are the same, first_match will be 0, and we should just keep existing tracks without adding
+            first_match = played_at.findIndex(value => existing_played_at.includes(value))
+
+            // concatenate
+            if (first_match < 0) {
+                all_tracks = new_tracks.concat(existing_tracks)
+            } else if (first_match == 0) {
+                all_tracks = existing_tracks
+            } else {
+                all_tracks = new_tracks.slice(0,first_match).concat(existing_tracks)
+            }
+        } else {
+            all_tracks = new_tracks
+        }
+
+        // update the refresh count column. this starts at 0 (from the backend) and is incremented every time the page
+        // reloads. it enables the user to see which tracks are new since the last refresh.
+        all_tracks.forEach(el => {el.refreshed_count = el.refreshed_count + 1})
+
+        // save in sessionStorage
+        sessionStorage.setItem('played_tracks', JSON.stringify(all_tracks))
+    </script>
+</head>
+<body style="font-family: 'Avenir'; font-size: 12px">
+
+    <h1>Ledgify</h1>
+    <p>
+        Spotify Ledger for {{ name }}
+    </p>
+
+    <div style="display: flex; width: 100%; justify-content: center;">
+        <div style="display: flex; width: 80%; flex-wrap: wrap;" id="tracks_container">
+            <div style="display:flex;width:100%;font-size: 14px; font-weight: bold;">
+                <div style="display:flex;width:20%;">
+                    Track
+                </div>
+                <div style="display:flex;width:20%;">
+                    Artist
+                </div>
+                <div style="display:flex;width:20%;">
+                    Played at
+                </div>
+                <div style="display:flex;width:20%;">
+                    Playlist
+                </div>
+                <div style="display:flex;width:20%;">
+                    Times Refreshed
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    /**
+     * Render the tracks
+     *
+     * We have to render from js, because js is required to generate the full list of tracks, and it executes
+     * client side. this script is in the bottom, because otherwise the container element to attach it to wouldn't
+     * exist yet.
+     */
+    let div
+    let col
+    column_style = "display:flex;width:20%;"
+    columns = ['track_name','artist_name','played_at','playlist_name','refreshed_count']
+    all_tracks.forEach(track => {
+        div = document.createElement('div')
+        div.style = "display:flex;width:100%;"
+
+        columns.forEach(column => {
+            col = document.createElement('div')
+            col.style = column_style
+            col.innerHTML = track[column]
+            div.appendChild(col)
+        })
+
+        document.getElementById('tracks_container').appendChild(div)
+    })
+
+</script>
+</html>

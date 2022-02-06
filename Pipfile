@@ -6,6 +6,10 @@ name = "pypi"
 [packages]
 flask = "*"
 numpy = "*"
+authlib = "*"
+requests = "*"
+python-dotenv = "*"
+pandas = "*"
 
 [dev-packages]
 
