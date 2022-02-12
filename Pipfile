@@ -10,6 +10,7 @@ authlib = "*"
 requests = "*"
 python-dotenv = "*"
 pandas = "*"
+gunicorn = "*"
 
 [dev-packages]
 
