@@ -1,0 +1,10 @@
+version: '3.9'
+
+services:
+  ledgify:
+    image: 'robteeuwen/ledgify:latest'
+    ports:
+      - "8081:8000"
+    env_file:
+      - .env
+

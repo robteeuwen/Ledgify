@@ -11,13 +11,23 @@ Ledgify uses an app factory. There is a `create_app` function inside the applica
 - You can also run this from a container. 
 
 ### Container configuration 
-The dockerfile is based on a python base image and uses pipenv to do a system-wide install of the dependencies in the `Pipfile`. It then uses `gunicorn` to run the application on port `8000`. You can build an image from the dockerfile: 
+The dockerfile is based on a python base image and uses pipenv to do a system-wide install of the dependencies in the `Pipfile`. It then uses `gunicorn` to run the application on port `8000`. You can build an image from the dockerfile:
 
-`docker build . -t ledgify:latest`
+`docker build . -t robteeuwen/ledgify:latest`
 
-and then run it (remember to expose port 8000)
+You can technically do this without `robteeuwen`, but then you'd not be able to push it to a remote registry. Then run it (remember to expose port 8000)
 
-`docker run -p [host-port]:8000 ledgify-latest`
+`docker run -p [host-port]:8000 robteeuwen/ledgify:latest`
+
+To push to docker hub: 
+
+`docker push robteeuwen/ledgify:latest`
+
+If you leave out the repository name (account name) you can't push. 
 
 ## Environment variables
-We need a couple of env variables to run this app. They are stored in `.env`, which is used for running locally. The keys that need to be set can be copied from `.env_template`. 
+We need a couple of env variables to run this app. They are stored in `.env`, which is used for running locally. The keys that need to be set can be copied from `.env_template`.
+
+When running a container with docker from the command line, the environment variables in `.env` won't be available in the container. The easiest way to copy them into the container is by using `docker-compose` for running the container: 
+
+`docker-compose up`
