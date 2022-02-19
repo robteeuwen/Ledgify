@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ledgify-deployment
+  labels:
+    app: ledgify
+spec:
+  replicas: 1
+  selector: # defines how the deployment can find which pods to manage
+    matchLabels:
+      app: ledgify
+  template: # defines a template for the pods in this spec
+    metadata:
+      labels:
+        app: ledgify
+    spec: # defines what happens inside the pod (in this case, the pod has one container, namely Ledgify)
+      containers:
+      - name: ledgify
+        image: robteeuwen/ledgify:latest
+        ports:
+          - containerPort: 8000
