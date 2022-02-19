@@ -1,5 +1,7 @@
 # Ledgify
 
+![CI to docker hub](https://github.com/robteeuwen/ledgify/actions/workflows/main.yml/badge.svg)
+
 ### Installing 
 Use `pipenv install` to install dependencies and `pipenv shell` to activate the virtual environment. 
 
