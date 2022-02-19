@@ -42,7 +42,7 @@ jobs:
           context: ./
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/Ledgify:latest
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/ledgify:latest
 
       # a digest is a hash of a docker image
       - name: Image digest
