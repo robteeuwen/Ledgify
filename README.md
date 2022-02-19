@@ -31,3 +31,7 @@ We need a couple of env variables to run this app. They are stored in `.env`, wh
 When running a container with docker from the command line, the environment variables in `.env` won't be available in the container. The easiest way to copy them into the container is by using `docker-compose` for running the container: 
 
 `docker-compose up`
+
+## CI/CD
+source: https://docs.docker.com/language/java/configure-ci-cd/
+
