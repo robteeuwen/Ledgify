@@ -1,0 +1,4 @@
+# these files are explicitly copied
+!Pipfile
+!Pipfile.lock
+.env
