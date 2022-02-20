@@ -64,6 +64,14 @@ This pod would normally be accessed using a load balancer, an IP, and then a reg
 `kubectl port-forward [pod-name] [local port]:8000`
 
 ### Accessing the service
-This can be done in two ways. Either by passing `type: loadBalancer` or by `type: nodePort`.
-- Load balancer: this automatically provisions a load balancer in the cloud service that you're using to run K8s. This usually costs money but it's a very easy setup. 
-- Node port: this opens a port on a node through which the service can be accessed. Maybe suboptimal? 
+Out of the box, this can be done using LoadBalancer or NodePorts. However, both these options have major drawbacks (for example, the loadbalancer option provisions a loadbalancer for each service you want to make publicly accessible). A better option is to use an Ingress. This also provisions a loadbalancer in your cloud provider, but you'll only need one. 
+
+Ingress consists of an ingress controller (for example, nginx or traefik), which runs in its own namespace. The configuration can then be applied using an ingress resource. 
+
+We can use `Helm` to install the ingress controller, and still use Kubernetes manifests to deploy the ingress resource. 
+
+To make the ingress work, first install Helm using homebrew. Then use the online instructions to install the ingress controller and deploy it to your cluster. Then apply the ingress resource: 
+
+`kubectl apply -f deployments/ingress.yaml`
+
+This should provision a load balancer in digital ocean. The ingress resource specifies a hostname. The final step to make this work is to find the IP of the load balancer and add it to your local hosts file, or add an A record to point the host to the IP for everyone. 
