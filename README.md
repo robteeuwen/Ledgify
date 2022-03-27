@@ -37,3 +37,12 @@ When running a container with docker from the command line, the environment vari
 ## CI/CD
 source: https://docs.docker.com/language/java/configure-ci-cd/
 
+## HEROKU 
+We can deploy to heroku using the container image. Use these steps: 
+
+`heroku container:push web -a ledgify`  
+`heroku container:release web -a ledgify`
+
+Heroku assigns a port itself, so you can't specify that in the Dockerfile. This may cause issues locally. Also, env variables need to be set using the Heroku command line. Refer to `.env` to know which variables need to be set, and set them manually using the Heroku cli. Like so: 
+
+`heroku config:set -a ledgify ENVVARIABLE=ENVVALUE`

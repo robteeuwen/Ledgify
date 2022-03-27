@@ -14,4 +14,8 @@ COPY . /app
 WORKDIR /app
 
 # now run the gunicorn command
-CMD ["gunicorn", "run:app", "-w", "2", "--threads", "2", "-b", "0.0.0.0:8000"]
+#CMD ["gunicorn", "run:app", "-w", "2", "--threads", "2", "-b", "0.0.0.0:8000"]
+
+# edit cmd for heroku
+# source: https://stackoverflow.com/questions/15693192/heroku-node-js-error-web-process-failed-to-bind-to-port-within-60-seconds-of
+CMD ["gunicorn", "run:app", "-w", "2", "--threads", "2"]
