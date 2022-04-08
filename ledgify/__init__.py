@@ -43,13 +43,24 @@ def create_app():
                     played_tracks = content['items']
 
                 # put in a dataframe
-                data = {
-                    'track_name': [track['track']['name'] for track in played_tracks],
-                    'artist_name': [track['track']['artists'][0]['name'] for track in played_tracks],
-                    'played_at': [track['played_at'] for track in played_tracks],
-                    'playlist_uri': [track['context']['href'] for track in played_tracks],
-                    'refreshed_count': 0
-                }
+                # edit: track['context'] is null starting the first week of april 2022. not sure why. put in a try catch
+                # until we know more.
+                try:
+                    data = {
+                        'track_name': [track['track']['name'] for track in played_tracks],
+                        'artist_name': [track['track']['artists'][0]['name'] for track in played_tracks],
+                        'played_at': [track['played_at'] for track in played_tracks],
+                        'playlist_uri': [track['context']['href'] for track in played_tracks],
+                        'refreshed_count': 0
+                    }
+                except:
+                    data = {
+                        'track_name': [track['track']['name'] for track in played_tracks],
+                        'artist_name': [track['track']['artists'][0]['name'] for track in played_tracks],
+                        'played_at': [track['played_at'] for track in played_tracks],
+                        'playlist_uri': None,
+                        'refreshed_count': 0
+                    }
 
                 df = pd.DataFrame(data)
                 df.played_at = pd.to_datetime(df.played_at)\
@@ -59,14 +70,17 @@ def create_app():
                 # get playlist information by creating a list of unique playlist uri's and querying them one by one
                 # then merge the resulting dataframe of playlist names to the original dataframe
                 playlists = pd.unique(df['playlist_uri'])
-                names = [requests.get(playlist, headers=headers).json()['name'] for playlist in playlists]
-                data = {
-                    'playlist_uri': playlists,
-                    'playlist_name': names
-                }
-                playlist_names = pd.DataFrame(data)
+                if None not in playlists:
+                    names = [requests.get(playlist, headers=headers).json()['name'] for playlist in playlists]
+                    data = {
+                        'playlist_uri': playlists,
+                        'playlist_name': names
+                    }
+                    playlist_names = pd.DataFrame(data)
 
-                df = df.merge(playlist_names, how='left', on='playlist_uri')
+                    df = df.merge(playlist_names, how='left', on='playlist_uri')
+                else:
+                    df['playlist_name'] = 'unknown'
 
                 # make a dict for easier looping in the template
                 tracks = df.to_dict('records')
