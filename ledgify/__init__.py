@@ -2,7 +2,7 @@ from datetime import datetime
 
 import pandas as pd
 import requests
-from flask import Flask, redirect, url_for, g, session, request, render_template
+from flask import Flask, redirect, url_for, g, session, request, render_template, current_app
 from authlib.integrations.requests_client import OAuth2Session
 import os
 
@@ -18,6 +18,9 @@ def create_app():
     app.secret_key = os.getenv('SECRET_KEY')
 
     with app.app_context():
+        # initialize an empty dataframe to contain all streamed tracks
+        current_app.alltracks = pd.DataFrame()
+
         @app.route('/')
         def index():
             if session.get('token'):
@@ -86,8 +89,15 @@ def create_app():
                 tracks = df.to_dict('records')
                 tracks_json = df.to_json(orient='records')
 
+                # let's keep the previously loaded tracks in a dataframe serverside
+                # and also store it as a csv every time
+                current_app.alltracks = pd.concat([df, current_app.alltracks]).drop_duplicates()
+                now = datetime.now()
+                dt_string = now.strftime("%Y-%m-%d_%H_%M_%S")
+                current_app.alltracks.to_csv(f'csv_backups/backup_{dt_string}.csv')
+
                 return render_template('index.html', name=user['display_name'], played_tracks=tracks,
-                                       tracks_json=tracks_json)
+                                       tracks_json=tracks_json, save_in_session=True)
             return "<p>Hello World!</p>"
 
         @app.route('/login')
@@ -128,6 +138,18 @@ def create_app():
             session['token'] = token
 
             return redirect(url_for('index'))
+
+        @app.route('/recover')
+        def recover():
+            # grab existing tracks from server memory
+            df = current_app.alltracks
+
+            # convert to dict and json
+            tracks = df.to_dict('records')
+            tracks_json = df.to_json(orient='records')
+
+            return render_template('index.html', name='Recovered from Flask current_app', played_tracks=tracks,
+                                       tracks_json=tracks_json, save_in_session=False)
 
         def token_refresh():
             token = session.get('token')

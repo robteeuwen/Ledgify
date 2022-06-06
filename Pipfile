@@ -11,6 +11,7 @@ requests = "*"
 python-dotenv = "*"
 pandas = "*"
 gunicorn = "*"
+dataframe-image = "*"
 
 [dev-packages]
 

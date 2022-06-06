@@ -24,6 +24,8 @@
         played_at = new_tracks.map(lambda => lambda.played_at)
 
         // extract old tracks
+        // if we are rendering this from a recovery (using data stored in flask) let's not involve session storage
+        {% if save_in_session %}
         if (sessionStorage.played_tracks !== undefined) {
             existing_tracks = JSON.parse(sessionStorage.getItem('played_tracks'))
             existing_played_at = existing_tracks.map(lambda => lambda.played_at)
@@ -45,13 +47,18 @@
         } else {
             all_tracks = new_tracks
         }
+        {% else %}
+        all_tracks = new_tracks
+        {% endif %}
 
         // update the refresh count column. this starts at 0 (from the backend) and is incremented every time the page
         // reloads. it enables the user to see which tracks are new since the last refresh.
         all_tracks.forEach(el => {el.refreshed_count = el.refreshed_count + 1})
 
         // save in sessionStorage
-        sessionStorage.setItem('played_tracks', JSON.stringify(all_tracks))
+        {% if save_in_session %}
+            sessionStorage.setItem('played_tracks', JSON.stringify(all_tracks))
+        {% endif %}
     </script>
 </head>
 <body style="font-family: 'Avenir'; font-size: 12px">
