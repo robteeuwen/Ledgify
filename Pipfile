@@ -12,6 +12,7 @@ python-dotenv = "*"
 pandas = "*"
 gunicorn = "*"
 dataframe-image = "*"
+jupyterlab = "*"
 
 [dev-packages]
 
